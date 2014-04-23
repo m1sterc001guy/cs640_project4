@@ -114,8 +114,13 @@ public class PacketHandler implements IOFMessageListener
         // TODO: Get destination MAC & find where destination host is connected
         // Hint: You can get the destination MAC address of the packet from the 
         //       match structure
+
+        log.debug("MATCH: " + match.toString());
+
+
         byte[] dstMacBytes = match.getDataLayerDestination();
         MACAddress dstMac = new MACAddress(dstMacBytes);
+        log.debug("dstMac: " + dstMac.toString());
         long dstMacLong = dstMac.toLong();
 
         IDevice device = null;
@@ -133,12 +138,14 @@ public class PacketHandler implements IOFMessageListener
 
         SwitchPort[] switchPorts = device.getAttachmentPoints();
         long dstId = -1;
+        short dstPort = -1;
         for(int i = 0; i < switchPorts.length; i++){
             log.debug("this dst host is connected to vertex: " + switchPorts[i].getSwitchDPID());
             dstId = switchPorts[i].getSwitchDPID();
+            dstPort = (short)switchPorts[i].getPort();
         }
 
-        if(dstId == -1){
+        if(dstId == -1 || dstPort == -1){
             log.error("ERROR dstId never found");
             return;
         }
@@ -161,7 +168,7 @@ public class PacketHandler implements IOFMessageListener
         for(Vertex v : fullTopo){
             if(v.getSwitch().getId() == dstId){
                dstVertex = v;
-               log.debug("setting dstVertex...");
+               log.debug("dstVertex: " + v.getSwitch().getId());
                break;
             }
         }
@@ -169,11 +176,10 @@ public class PacketHandler implements IOFMessageListener
         for(Vertex v : fullTopo){
             if(v.getSwitch().getId() == inSwitch.getId()){
                srcVertex = v;
-               log.debug("setting srcVertex...");
+               log.debug("srcVertex: " + v.getSwitch().getId());
                break;
             }
         }
-
 
         
         ///////////////////////////////////////////////////////////////////////
@@ -196,7 +202,20 @@ public class PacketHandler implements IOFMessageListener
         // Hint: Don't forget to handle the case where both source and
         //       and destination hosts are connect to the same switch
 
+        //this code will be changing when the rules are installed
+        FlowInstaller installer = new FlowInstaller();
+        if(path.size() > 1){
+           Vertex currVertex = path.get(0);
+           Vertex nextVertex = path.get(1);
+           Edge edge = currVertex.getEdgeToNeighbor(nextVertex);
+           installer.forwardPacket(currVertex.getSwitch(), edge.getSrcSwitchPort(), pktInMsg);
+        }
+        else{
+           Vertex currVertex = path.get(0);
+           installer.forwardPacket(currVertex.getSwitch(), dstPort, pktInMsg);
+        }
         
+
         
         ///////////////////////////////////////////////////////////////////////
 	}

@@ -115,12 +115,13 @@ public class PacketHandler implements IOFMessageListener
         // Hint: You can get the destination MAC address of the packet from the 
         //       match structure
 
-        log.debug("MATCH: " + match.toString());
+        log.debug("INSTALL PATH FOR FLOW CALLED!!!!");
+
 
 
         byte[] dstMacBytes = match.getDataLayerDestination();
         MACAddress dstMac = new MACAddress(dstMacBytes);
-        log.debug("dstMac: " + dstMac.toString());
+        //log.debug("dstMac: " + dstMac.toString());
         long dstMacLong = dstMac.toLong();
 
         IDevice device = null;
@@ -140,7 +141,7 @@ public class PacketHandler implements IOFMessageListener
         long dstId = -1;
         short dstPort = -1;
         for(int i = 0; i < switchPorts.length; i++){
-            log.debug("this dst host is connected to vertex: " + switchPorts[i].getSwitchDPID());
+            //log.debug("this dst host is connected to vertex: " + switchPorts[i].getSwitchDPID());
             dstId = switchPorts[i].getSwitchDPID();
             dstPort = (short)switchPorts[i].getPort();
         }
@@ -168,7 +169,7 @@ public class PacketHandler implements IOFMessageListener
         for(Vertex v : fullTopo){
             if(v.getSwitch().getId() == dstId){
                dstVertex = v;
-               log.debug("dstVertex: " + v.getSwitch().getId());
+               //log.debug("dstVertex: " + v.getSwitch().getId());
                break;
             }
         }
@@ -176,7 +177,7 @@ public class PacketHandler implements IOFMessageListener
         for(Vertex v : fullTopo){
             if(v.getSwitch().getId() == inSwitch.getId()){
                srcVertex = v;
-               log.debug("srcVertex: " + v.getSwitch().getId());
+               //log.debug("srcVertex: " + v.getSwitch().getId());
                break;
             }
         }
@@ -190,8 +191,8 @@ public class PacketHandler implements IOFMessageListener
         	return;
         }
         
-        log.debug(String.format("SrcSwitch = %s, DstSwitch = %s", 
-        		srcVertex, dstVertex));
+        //log.debug(String.format("SrcSwitch = %s, DstSwitch = %s", 
+        //		srcVertex, dstVertex));
         
         // Find the shortest path through the network from source to destination
         Dijkstra.computePaths(srcVertex);
@@ -202,7 +203,6 @@ public class PacketHandler implements IOFMessageListener
         // Hint: Don't forget to handle the case where both source and
         //       and destination hosts are connect to the same switch
 
-        //this code will be changing when the rules are installed
         FlowInstaller installer = new FlowInstaller();
         if(srcVertex.compareTo(dstVertex) == 0){
            installer.installRule(inSwitch, pktInMsg.getInPort(), dstPort, match);

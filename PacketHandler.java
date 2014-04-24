@@ -204,17 +204,23 @@ public class PacketHandler implements IOFMessageListener
 
         //this code will be changing when the rules are installed
         FlowInstaller installer = new FlowInstaller();
-        if(path.size() > 1){
-           Vertex currVertex = path.get(0);
-           Vertex nextVertex = path.get(1);
-           Edge edge = currVertex.getEdgeToNeighbor(nextVertex);
-           installer.forwardPacket(currVertex.getSwitch(), edge.getSrcSwitchPort(), pktInMsg);
+        if(srcVertex.compareTo(dstVertex) == 0){
+           installer.installRule(inSwitch, pktInMsg.getInPort(), dstPort, match);
+           installer.forwardPacket(inSwitch, dstPort, pktInMsg);
+           return;
         }
-        else{
-           Vertex currVertex = path.get(0);
-           installer.forwardPacket(currVertex.getSwitch(), dstPort, pktInMsg);
-        }
-        
+
+        for(int i = 0; i < path.size() - 1; i++){
+            Vertex currVertex = path.get(i);
+            Vertex nextVertex = path.get(i+1);
+            Edge edge = currVertex.getEdgeToNeighbor(nextVertex);
+            installer.installRule(currVertex.getSwitch(), pktInMsg.getInPort(), edge.getSrcSwitchPort(), match);
+        } 
+
+        Vertex currVertex = path.get(0);
+        Vertex nextVertex = path.get(1);
+        Edge edge = currVertex.getEdgeToNeighbor(nextVertex);
+        installer.forwardPacket(currVertex.getSwitch(), edge.getSrcSwitchPort(), pktInMsg);
 
         
         ///////////////////////////////////////////////////////////////////////

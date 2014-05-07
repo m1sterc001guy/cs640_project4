@@ -51,7 +51,7 @@ class Edge
     	this.srcVert = srcVert;
     	this.dstVert = dstVert;
     	this.srcSwPort = srcSwPort;
-    	this.dstSwPort = srcSwPort;
+    	this.dstSwPort = dstSwPort;
     }
     
     /**

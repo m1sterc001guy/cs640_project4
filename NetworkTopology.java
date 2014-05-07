@@ -53,15 +53,8 @@ public class NetworkTopology
 	 */
 	public Collection<Vertex> getFullTopology()
 	{
-        ///////////////////////////////////////////////////////////////////////
-		// TODO: Construct the full topology of switches and links (do not 
-		//		 include hosts)
-		// Hint: you should have a vertex for each switch and you should have 
-		//		 edges for each link
-
                 Collection<Vertex> topo = new ArrayList<Vertex>();
 		
-                log.debug("GETFULLTOPOLOGY");
                 Collection<IOFSwitch> allSwitches =  this.getSwitches();
                 for(IOFSwitch s : allSwitches){
                     Vertex v = new Vertex(s);
@@ -70,8 +63,6 @@ public class NetworkTopology
 
                 Collection<Link> links =  this.getLinks();
                 for(Link l : links){
-                    //log.debug("src: " + l.getSrc() + " dst: " + l.getDst());
-                    
                     //get the source vertex first
                     Vertex src = null;
                     for(Vertex v : topo){
@@ -96,24 +87,8 @@ public class NetworkTopology
                     }
 
                     src.addNeighbor(dst, l.getSrcPort(), l.getDstPort());
-                    //log.debug("src vertex: " + src.getSwitch().getId() + " dst vertex: " + dst.getSwitch().getId() + " src port: " + l.getSrcPort() + " dst port: " + l.getDstPort());
-
                 }
                 return topo;
-
-                /*
-                log.debug("NUM VERTICES: " + topo.size());
-                for(Vertex v : topo){
-                    log.debug("vertex " + v.getSwitch().getId() + " has " + v.getAdjacencies().size() + " links");
-                }
-                */
-
-                //this.printHosts();
-                //this.printSwitches();
-                //this.printLinks();
-                //return null;
-		
-		///////////////////////////////////////////////////////////////////////
 	}
 
 	/**

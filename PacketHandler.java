@@ -110,7 +110,7 @@ public class PacketHandler implements IOFMessageListener
         OFMatch match = new OFMatch();
         match.loadFromPacket(pktInMsg.getPacketData(), pktInMsg.getInPort());
 
-        log.debug("INSTALL PATH FOR FLOW CALLED!!!!");
+        //log.debug("INSTALL PATH FOR FLOW CALLED!!!!");
 
 
 
